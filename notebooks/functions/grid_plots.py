@@ -18,7 +18,7 @@ def plot_grid_bar(data, columns, by=None):
     rows = (num_plots + 1) // 2
 
     # Create subplots grid
-    fig, axs = plt.subplots(nrows=rows, ncols=2, figsize=(12, 4 * rows))
+    fig, ax = plt.subplots(nrows=rows, ncols=2, figsize=(12, 4 * rows))
 
     # Iterate over the columns and plot their distributions
     for i, column in enumerate(columns):
@@ -26,16 +26,20 @@ def plot_grid_bar(data, columns, by=None):
         col = i % 2
 
         # Plot barplot in respective subplot
-        sns.countplot(data=data, x=column, ax=axs[row, col], hue=by)
-        axs[row, col].set_ylabel('Count')
-        axs[row, col].set_xlabel(column)
-        axs[row, col].set_title(column)
+        sns.countplot(data=data, x=column, ax=ax[row, col], hue=by)
+        ax[row, col].set_ylabel('Count')
+        ax[row, col].set_xlabel(column)
+        ax[row, col].set_title(column)
 
         # Annotate value counts on each bar
-        for p in axs[row, col].patches:
+        for p in ax[row, col].patches:
             height = p.get_height()
-            axs[row, col].annotate(f'{height}', (p.get_x() + p.get_width() / 2., height),
-                                   ha='center', va='center', xytext=(0, 10), textcoords='offset points')
+            ax[row, col].annotate(f'{height}', (p.get_x() + p.get_width() / 2., height),
+                                  ha='center', va='center', xytext=(0, 10), textcoords='offset points')
+
+    # Delete the last subplot if the number of plots is odd
+    if num_plots % 2 != 0:
+        fig.delaxes(ax[-1,1])
 
     # Layout spacing
     fig.tight_layout()
@@ -58,7 +62,7 @@ def plot_grid_displots(data, columns, units_list):
     rows = (num_plots + 1) // 2
 
     # Create subplots grid
-    fig, axs = plt.subplots(nrows=rows, ncols=2, figsize=(12, 4 * rows))
+    fig, ax = plt.subplots(nrows=rows, ncols=2, figsize=(12, 4 * rows))
 
     # Iterate over the columns and plot their distributions
     for i, column in enumerate(columns):
@@ -66,20 +70,24 @@ def plot_grid_displots(data, columns, units_list):
         col = i % 2
 
         # Plot displot in subplot
-        sns.histplot(data=data, x=column, ax=axs[row, col], kde=True)
-        axs[row, col].set_title(column)
-        axs[row, col].set_xlabel(f'{column} ({units_list[i]})')
-        axs[row, col].set_ylabel(f'Count')
+        sns.histplot(data=data, x=column, ax=ax[row, col], kde=True)
+        ax[row, col].set_title(column)
+        ax[row, col].set_xlabel(f'{column} ({units_list[i]})')
+        ax[row, col].set_ylabel(f'Count')
 
         # Add vertical lines for median and mean
         median = data[column].median()
         mean = data[column].mean()
-        axs[row, col].axvline(median, color='r', linestyle='dotted',
-                              label=f'Median = {data[column].median():.2f} {units_list[i]}')
-        axs[row, col].axvline(mean, color='g', linestyle='dotted',
-                              label=f'Mean = {data[column].mean():.2f} {units_list[i]}')
+        ax[row, col].axvline(median, color='r', linestyle='dotted',
+                             label=f'Median = {data[column].median():.2f} {units_list[i]}')
+        ax[row, col].axvline(mean, color='g', linestyle='dotted',
+                             label=f'Mean = {data[column].mean():.2f} {units_list[i]}')
 
-        axs[row, col].legend()
+        ax[row, col].legend()
+
+    # Delete the last subplot if the number of plots is odd
+    if num_plots % 2 != 0:
+        fig.delaxes(ax[-1,1])
 
     # Layout spacing
     fig.tight_layout()
@@ -103,23 +111,23 @@ def plot_grid_violin(data, binom, continuous_vars, binom_vars, title_fontsize=19
     num_discrete_vars = len(binom_vars)
 
     # Create subplots grid
-    fig, axs = plt.subplots(num_continuous_vars,
-                            num_discrete_vars,
-                            figsize=(6 * num_discrete_vars, 4 * num_continuous_vars))
+    fig, ax = plt.subplots(num_continuous_vars,
+                           num_discrete_vars,
+                           figsize=(6 * num_discrete_vars, 4 * num_continuous_vars))
 
     # Iterate over continuous variables
     for i, continuous_var in enumerate(continuous_vars):
         # Iterate over discrete variables
         for j, discrete_var in enumerate(binom_vars):
             # Plot violin plot in respective subplot
-            sns.violinplot(data=data, x=binom, y=continuous_var, hue=discrete_var, split=True, ax=axs[i, j])
-            axs[i, j].set_xlabel(binom)
-            axs[i, j].set_ylabel(continuous_var)
-            axs[i, j].legend(title=discrete_var)
+            sns.violinplot(data=data, x=binom, y=continuous_var, hue=discrete_var, split=True, ax=ax[i, j])
+            ax[i, j].set_xlabel(binom)
+            ax[i, j].set_ylabel(continuous_var)
+            ax[i, j].legend(title=discrete_var)
 
             # Add subplot title
             title = f'{continuous_var} vs {binom} by {discrete_var}'
-            axs[i, j].set_title(title, fontsize=title_fontsize)
+            ax[i, j].set_title(title, fontsize=title_fontsize)
 
     # Layout spacing
     fig.tight_layout()
