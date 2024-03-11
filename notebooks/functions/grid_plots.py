@@ -137,12 +137,13 @@ def plot_grid_violin(data, binom, continuous_vars, binom_vars, title_fontsize=19
 
 
 # Function that plots a grid of box plots
-def plot_box_grid(data, cols):
+def plot_box_grid(data, cols, figsize=(15, 15)):
     """
     Grid-wise plots the distribution of values for specified columns of a dataset.
     Args:
         data (pandas DataFrame): Dataframe
         cols (list): Columns to be plotted
+        figsize (tuple): Size of the figure (optional, default=(15, 15)
     """
 
     # Calculate the number of rows and columns based on the number of columns in columns_list
@@ -150,7 +151,7 @@ def plot_box_grid(data, cols):
     num_rows = math.ceil(num_columns / 4)
 
     # Create the subplot grid
-    fig, ax = plt.subplots(num_rows, 4, figsize=(15, 15))
+    fig, ax = plt.subplots(num_rows, 4, figsize=figsize)
 
     # Flatten the ax array if the grid is not perfect (e.g., 2x4 instead of 4x4)
     if isinstance(ax, np.ndarray):
@@ -163,6 +164,10 @@ def plot_box_grid(data, cols):
         data.boxplot(column, ax=ax[i])
         ax[i].set_title(column)
 
+    # Remove any empty subplots
+    for i in range(num_columns, len(ax)):
+        fig.delaxes(ax[i])
+    
     plt.subplots_adjust(hspace=0.2)
 
     plt.show()
