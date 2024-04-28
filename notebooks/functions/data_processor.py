@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 from sklearn.preprocessing import StandardScaler
 
-df = pd.read_csv("../../data/interim/data_droped.csv")
+df = pd.read_csv("../../data/interim/data_imputed_2.csv")
 
 # Function to classify continuous column into 3 classes
 def classify_col_by_3(data, cont_col, class_col, cutoff1, cutoff2):
@@ -63,9 +63,9 @@ df = pd.get_dummies(df, columns=['education', 'diabetes_stage', 'smoker_class', 
 categorical_columns = ['male', 
                     'BPMeds', 
                     'prevalentStroke', 
-                    'education_1',
-                    'education_2',
-                    'education_3',
+                    'education_1.0',
+                    'education_2.0',
+                    'education_3.0',
                     'diabetes_stage_1',
                     'diabetes_stage_2',
                     'smoker_class_1',
@@ -95,5 +95,15 @@ df[continuous_columns] = scaled_df
 # Display the first few rows of the dataset
 df.head()
 
-# Save the processed data
-df.to_csv("../../data/processed/data_drop_processed.csv", index=False)
+# Ask the user if they want to save the processed data
+save = input("Do you want to save the processed data? (y/n): ")
+
+if save == 'y':
+    # Ask the user for the file name
+    file_name = input("Enter the file name: ")
+    # Save the processed data
+    df.to_csv("../../data/processed/file_name", index=False)
+    print("Data saved successfully!")
+    
+else:
+    print("Data not saved!")

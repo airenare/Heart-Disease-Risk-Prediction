@@ -3,9 +3,13 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 
+# Function to add annotation to the bottom right of the plot
+def annotate(annotation):
+    # Add annotation to the bottom right of the frame
+    plt.text(1, -0.2, annotation, fontsize=10, ha='right', va='bottom', transform=plt.gca().transAxes)
 
 # Function to plot bar charts in a grid
-def plot_grid_bar(data, columns, by=None):
+def plot_grid_bar(data, columns, by=None, title=None, annotation=None):
     """
     Grid-wise plots the barplots for specified columns of a dataset. With hue split.
     Args:
@@ -19,23 +23,29 @@ def plot_grid_bar(data, columns, by=None):
 
     # Create subplots grid
     fig, ax = plt.subplots(nrows=rows, ncols=2, figsize=(12, 4 * rows))
-
+    # Set the title of the plot
+    if title:
+        fig.suptitle(title, fontsize=20)
+    
     # Iterate over the columns and plot their distributions
     for i, column in enumerate(columns):
         row = i // 2
         col = i % 2
 
         # Plot barplot in respective subplot
-        sns.countplot(data=data, x=column, ax=ax[row, col], hue=by)
+        sns.histplot(data=data, x=column, ax=ax[row, col], hue=by, multiple='dodge', shrink=0.8)
         ax[row, col].set_ylabel('Count')
         ax[row, col].set_xlabel(column)
-        ax[row, col].set_title(column)
+        # ax[row, col].set_title(column)
 
         # Annotate value counts on each bar
         for p in ax[row, col].patches:
             height = p.get_height()
             ax[row, col].annotate(f'{height}', (p.get_x() + p.get_width() / 2., height),
-                                  ha='center', va='center', xytext=(0, 10), textcoords='offset points')
+                                ha='center', va='center', xytext=(0, 10), textcoords='offset points')
+        
+        # Show only whole numbers on x-axis
+        ax[row, col].xaxis.set_major_locator(plt.MaxNLocator(integer=True))
 
     # Delete the last subplot if the number of plots is odd
     if num_plots % 2 != 0:
@@ -44,12 +54,14 @@ def plot_grid_bar(data, columns, by=None):
     # Layout spacing
     fig.tight_layout()
 
+    annotate(annotation)
+    
     # Show plot
     plt.show()
 
 
 # Function to plot distributions of columns with median and mean in a tiled grid
-def plot_grid_displots(data, columns, units_list):
+def plot_grid_displots(data, columns, units_list, title='Distributions of Continuous Variables with Median and Mean', show_titles=True, annotation=None):
     """
     Grid-wise plots the distribution of values for specified columns of a dataset.
     Args:
@@ -64,6 +76,8 @@ def plot_grid_displots(data, columns, units_list):
     # Create subplots grid
     fig, ax = plt.subplots(nrows=rows, ncols=2, figsize=(12, 4 * rows))
 
+    # Create a title for the plot
+    fig.suptitle(title, fontsize=20)
     # Iterate over the columns and plot their distributions
     for i, column in enumerate(columns):
         row = i // 2
@@ -71,7 +85,8 @@ def plot_grid_displots(data, columns, units_list):
 
         # Plot displot in subplot
         sns.histplot(data=data, x=column, ax=ax[row, col], kde=True)
-        ax[row, col].set_title(column)
+        if show_titles:
+            ax[row, col].set_title(column)
         ax[row, col].set_xlabel(f'{column} ({units_list[i]})')
         ax[row, col].set_ylabel(f'Count')
 
@@ -91,12 +106,14 @@ def plot_grid_displots(data, columns, units_list):
 
     # Layout spacing
     fig.tight_layout()
+    
+    annotate(annotation)
 
     # Show plot
     plt.show()
 
 
-def plot_grid_violin(data, binom, continuous_vars, binom_vars, title_fontsize=19):
+def plot_grid_violin(data, binom, continuous_vars, binom_vars, title_fontsize=19, annotation=None):
     """
     Grid-wise plots the violin plots for specified continuous variables against discrete
     binomial variable and discrete binomial variables as hue in a dataset.
@@ -115,6 +132,9 @@ def plot_grid_violin(data, binom, continuous_vars, binom_vars, title_fontsize=19
                            num_discrete_vars,
                            figsize=(6 * num_discrete_vars, 4 * num_continuous_vars))
 
+    # Create a title for the plot
+    # fig.suptitle(f'Violin Plots of {binom} by {continuous_vars} and {binom_vars}', fontsize=20)
+    
     # Iterate over continuous variables
     for i, continuous_var in enumerate(continuous_vars):
         # Iterate over discrete variables
@@ -131,13 +151,13 @@ def plot_grid_violin(data, binom, continuous_vars, binom_vars, title_fontsize=19
 
     # Layout spacing
     fig.tight_layout()
-
+    annotate(annotation)
     # Show plot
     plt.show()
 
 
 # Function that plots a grid of box plots
-def plot_box_grid(data, cols, figsize=(15, 15)):
+def plot_box_grid(data, cols, figsize=(15, 15), title='Box Plots of Continuous Variables', title_fontsize=20, show_titles=True, annotation=None):
     """
     Grid-wise plots the distribution of values for specified columns of a dataset.
     Args:
@@ -152,6 +172,8 @@ def plot_box_grid(data, cols, figsize=(15, 15)):
 
     # Create the subplot grid
     fig, ax = plt.subplots(num_rows, 4, figsize=figsize)
+    # Set the title of the plot
+    fig.suptitle(title, fontsize=title_fontsize)
 
     # Flatten the ax array if the grid is not perfect (e.g., 2x4 instead of 4x4)
     if isinstance(ax, np.ndarray):
@@ -162,16 +184,30 @@ def plot_box_grid(data, cols, figsize=(15, 15)):
     # Loop through the columns and draw the box plots
     for i, column in enumerate(cols):
         data.boxplot(column, ax=ax[i])
-        ax[i].set_title(column)
+        if show_titles:
+            ax[i].set_title(column)
 
     # Remove any empty subplots
     for i in range(num_columns, len(ax)):
         fig.delaxes(ax[i])
     
     plt.subplots_adjust(hspace=0.2)
-
+    annotate(annotation)
     plt.show()
 
 
+def test():
+    import pandas as pd
+    
+    df = pd.read_csv("../../data/interim/data_droped.csv")
+
+    categorical_cols = ['male', 'education', 'currentSmoker', 'BPMeds', 'prevalentStroke', 'prevalentHyp', 'diabetes']
+    continuous_cols = ['age', 'cigsPerDay', 'totChol', 'sysBP', 'diaBP', 'BMI', 'heartRate', 'glucose']
+    cont_units = ['years', 'cigs/day', 'mg/dl', 'mmHg', 'mmHg', 'kg/m^2', 'bpm', 'mg/dl']
+
+    plot_grid_bar(data=df, columns=categorical_cols, by='TenYearCHD')
+    
+
 if __name__ == '__main__':
+    test()
     pass
