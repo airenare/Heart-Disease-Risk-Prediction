@@ -23,10 +23,10 @@ def get_function_code(func):
 # Test the function
 def test_get_function_code():
     def test_func():
-        print('This is a test function.')
+        print("This is a test function.")
 
     get_function_code(test_func)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     test_get_function_code()

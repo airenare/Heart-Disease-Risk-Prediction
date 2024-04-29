@@ -24,11 +24,11 @@ def plot_ecdf(data, x_label=None, normal_overlay=True):
     y = np.arange(1, n + 1) / n
 
     # Plot the ECDF
-    plt.plot(x, y, marker='.', linestyle='none')
+    plt.plot(x, y, marker=".", linestyle="none")
 
     # Label the axes
-    plt.xlabel(x_label) if x_label else plt.xlabel('x')
-    plt.ylabel('ECDF')
+    plt.xlabel(x_label) if x_label else plt.xlabel("x")
+    plt.ylabel("ECDF")
 
     # Overlay a normal distribution if requested
     if normal_overlay:
@@ -73,7 +73,7 @@ def plot_ecdf_overlay(data, x_label=None, overlay=None, axis=None):
     if axis is None:
         fig, axis = plt.subplots()
 
-    axis.plot(x, y, marker='.', linestyle='none', label='ECDF')
+    axis.plot(x, y, marker=".", linestyle="none", label="ECDF")
 
     # Overlay a normal distribution if requested
     # Compute mean and standard deviation
@@ -83,7 +83,7 @@ def plot_ecdf_overlay(data, x_label=None, overlay=None, axis=None):
     if overlay is None:
         pass
 
-    elif overlay == 'normal':
+    elif overlay == "normal":
         # Sample out of a normal distribution with the same mean and standard deviation
         samples = np.random.normal(mu, sigma, size=10000)
 
@@ -91,21 +91,18 @@ def plot_ecdf_overlay(data, x_label=None, overlay=None, axis=None):
         x_theo = np.sort(samples)
         y_theo = np.arange(1, len(x_theo) + 1) / len(x_theo)
 
-
-
-    elif overlay == 'exponential':
+    elif overlay == "exponential":
         # If mean is negative, adjust it
         mu = 0.0000001 if mu < 0 else mu
 
         # Sample out of an exponential distribution with the same mean and standard deviation
-        samples = np.random.exponential(1/mu, size=len(data))
+        samples = np.random.exponential(1 / mu, size=len(data))
 
         # Get the CDF of the samples and of the data
         x_theo = np.sort(samples)
         y_theo = np.arange(1, len(x_theo) + 1) / len(x_theo)
 
-
-    elif overlay == 'uniform':
+    elif overlay == "uniform":
         # Sample out of a uniform distribution with the same mean and standard deviation
         samples = np.random.uniform(low=data.min(), high=data.max(), size=10000)
 
@@ -113,14 +110,12 @@ def plot_ecdf_overlay(data, x_label=None, overlay=None, axis=None):
         x_theo = np.sort(samples)
         y_theo = np.arange(1, len(x_theo) + 1) / len(x_theo)
 
-
-    elif overlay == 'binomial':
+    elif overlay == "binomial":
         # If mean is negative or greater than 1, adjust it
         if mu < 0:
             mu = 0.0000001
         elif mu > 1:
             mu = 0.9999999
-
 
         n = 1
         p = mu / n
@@ -132,19 +127,17 @@ def plot_ecdf_overlay(data, x_label=None, overlay=None, axis=None):
         x_theo = np.sort(samples)
         y_theo = np.arange(1, len(x_theo) + 1) / len(x_theo)
 
-
     else:
-        raise ValueError('Invalid distribution type')
+        raise ValueError("Invalid distribution type")
 
     # print(f'{mu = }')
 
     # Plot the CDFs
     axis.plot(x_theo, y_theo, label=overlay) if overlay is not None else None
 
-
     # Label the axes
-    axis.set_xlabel(x_label) if x_label else axis.set_xlabel('x')
-    axis.set_ylabel('ECDF')
+    axis.set_xlabel(x_label) if x_label else axis.set_xlabel("x")
+    axis.set_ylabel("ECDF")
 
     # Display legend if overlay is specified
     if overlay:
@@ -155,7 +148,7 @@ def plot_ecdf_overlay(data, x_label=None, overlay=None, axis=None):
         plt.show()
 
 
-def testing(dist_type='normal'):
+def testing(dist_type="normal"):
     """
     Test function for the ECDF plotter.
     Args:
@@ -165,43 +158,40 @@ def testing(dist_type='normal'):
     np.random.seed(42)
 
     match dist_type:
-        case 'normal':
+        case "normal":
             # Random numbers from a normal distribution
             test_data = np.random.normal(loc=0, scale=1, size=1000)
-        case 'exponential':
+        case "exponential":
             # Random numbers from an exponential distribution
             test_data = np.random.exponential(scale=1, size=1000)
-        case 'uniform':
+        case "uniform":
             # Random numbers from a uniform distribution
             test_data = np.random.uniform(low=0, high=1, size=1000)
-        case 'binomial':
+        case "binomial":
             # Random numbers from a binomial distribution
             test_data = np.random.binomial(n=100, p=0.05, size=1000)
         case _:
-            raise ValueError('Invalid distribution type')
+            raise ValueError("Invalid distribution type")
 
     # Plot the ECDF
-    plot_ecdf(test_data, x_label='Value', normal_overlay=True)
+    plot_ecdf(test_data, x_label="Value", normal_overlay=True)
 
 
 def test_all_distributions(data):
-    distributions = ['normal', 'exponential', 'uniform', 'binomial']
+    distributions = ["normal", "exponential", "uniform", "binomial"]
 
     fig, axes = plt.subplots(2, 2, figsize=(10, 10))
 
     for i, distribution in enumerate(distributions):
         ax = axes[i // 2, i % 2]
         plot_ecdf_overlay(data, overlay=distribution, axis=ax)
-        ax.set_title(f'ECDF with {distribution} Overlay')
+        ax.set_title(f"ECDF with {distribution} Overlay")
 
     plt.tight_layout()
     plt.show()
 
 
-if __name__ == '__main__':
-
-
-
+if __name__ == "__main__":
     # Random numbers from a normal distribution
     data1 = np.random.normal(loc=0, scale=1, size=1000)
 
